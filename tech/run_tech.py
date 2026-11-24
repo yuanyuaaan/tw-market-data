@@ -136,8 +136,11 @@ def run_tw(cfg: dict) -> dict:
                 notes.append(f"{code}：{first} 前用 {m['merge_from']}、之後用 {m['fetch']} 的日K 接起來")
             else:
                 bars = tw_bars(code, start, end)
-            bars, adj = adjust_splits(bars)
-            notes += [f"{code} {m['name']}：{a}" for a in adj]
+            if m.get("no_adjust"):
+                notes.append(f"{code} {m['name']}：不做價格斷層還原（{m['no_adjust']}）")
+            else:
+                bars, adj = adjust_splits(bars)
+                notes += [f"{code} {m['name']}：{a}" for a in adj]
             series[code] = bars
         except Exception as e:  # noqa: BLE001
             missing.append(f"{code} {m['name']}：{e}")
