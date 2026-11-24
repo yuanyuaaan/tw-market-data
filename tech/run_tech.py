@@ -167,7 +167,7 @@ def run_tw(cfg: dict) -> dict:
         inst = finmind("TaiwanStockTotalInstitutionalInvestors", None, dates[0], end)
         fn = {}
         for x in inst:
-            if x.get("name") in ("Foreign_Investor", "Foreign_Dealer_Self"):
+            if x.get("name") == "Foreign_Investor":  # 外資及陸資（不含外資自營商），與新聞口徑一致
                 fn[x["date"]] = fn.get(x["date"], 0) + (x["buy"] - x["sell"]) / 1e8
     except Exception as e:  # noqa: BLE001
         fn = {}
