@@ -3,12 +3,16 @@ name: tech
 # Daily bars -> indicators and breadth, saved to data/*.json for the dashboard and the Claude reports.
 # Taiwan: 15:40 and 16:40 Taipei on weekdays (FinMind usually has the day's bars by mid-afternoon;
 #         the second run catches late data). US: 06:10 Taipei Tue–Sat, after the New York close.
+# Also runs when the code or the watchlist changes.
 # GitHub cron is UTC and often starts 5–20 minutes late.
 on:
   schedule:
     - cron: "40 7 * * 1-5"
     - cron: "40 8 * * 1-5"
     - cron: "10 22 * * 1-5"
+  push:
+    branches: [main]
+    paths: ["tech/**", ".github/workflows/tech.yml"]
   workflow_dispatch:
     inputs:
       market:
@@ -38,6 +42,7 @@ jobs:
         id: pick
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then m="${{ inputs.market }}";
+          elif [ "${{ github.event_name }}" = "push" ]; then m=both;
           elif [ "${{ github.event.schedule }}" = "10 22 * * 1-5" ]; then m=us; else m=tw; fi
           [ "$m" = both ] && m="tw us"
           echo "markets=$m" >> "$GITHUB_OUTPUT"
